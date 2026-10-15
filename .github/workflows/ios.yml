@@ -1,0 +1,79 @@
+# Ejderha Süvarisi — iPhone (.ipa) derlemesi
+# GitHub'ın bulut Mac'inde çalışır: Godot ile Xcode projesini çıkarır, imzasız derler,
+# .ipa dosyasını "Releases" sayfasına (ios-son-surum) koyar. Sideloadly kurulumda imzalar.
+name: iPhone derlemesi
+
+on:
+  push:
+    branches: [main]
+    paths: ["game/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 60
+    env:
+      GODOT_VERSION: "4.7.2"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Godot ve iOS şablonunu indir
+        run: |
+          set -e
+          curl -sSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
+          unzip -q godot.zip
+          curl -sSL -o tpl.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          TPL="$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$TPL"
+          unzip -q -j tpl.tpz templates/ios.zip templates/version.txt -d "$TPL"
+          rm tpl.tpz godot.zip
+
+      - name: Xcode projesini çıkar
+        run: |
+          set -e
+          GODOT="$PWD/Godot.app/Contents/MacOS/Godot"
+          cd game
+          mkdir -p build
+          "$GODOT" --headless --import || true
+          "$GODOT" --headless --export-release "iOS" build/EjderhaSuvarisi.ipa
+          ls build
+
+      - name: İmzasız derle (.app)
+        run: |
+          set -e
+          cd game/build
+          xcodebuild -project EjderhaSuvarisi.xcodeproj -scheme EjderhaSuvarisi \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath dd \
+            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_ENTITLEMENTS="" DEVELOPMENT_TEAM="" \
+            build | tail -n 40
+          ls dd/Build/Products/Release-iphoneos
+
+      - name: .ipa paketle
+        run: |
+          set -e
+          cd game/build
+          rm -rf Payload && mkdir Payload
+          cp -R dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app Payload/
+          zip -qry ../../EjderhaSuvarisi.ipa Payload
+          ls -lh ../../EjderhaSuvarisi.ipa
+
+      - name: Dosyayı yükle (Actions)
+        uses: actions/upload-artifact@v4
+        with:
+          name: EjderhaSuvarisi-ipa
+          path: EjderhaSuvarisi.ipa
+
+      - name: Releases sayfasına koy
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete ios-son-surum --yes --cleanup-tag || true
+          gh release create ios-son-surum EjderhaSuvarisi.ipa \
+            --title "iPhone — son sürüm (#${{ github.run_number }})" \
+            --notes "Sideloadly ile kur. Derleme: ${{ github.sha }}"

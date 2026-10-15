@@ -1,0 +1,4 @@
+.godot/
+game/build/
+*.ipa
+*.import

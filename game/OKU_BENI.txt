@@ -1,0 +1,55 @@
+EJDERHA SÜVARİSİ — ALP VADİSİ  (sürüm 1.1)
+Godot 4.7 için tek dosyalık (ejderha.gd) açık dünya ejderha uçuş oyunu.
+
+NASIL ÇALIŞTIRILIR
+1) Godot 4.7'yi indir: https://godotengine.org/download  (Standart sürüm yeterli, .NET gerekmez)
+2) Bu klasörü bir yere çıkar.
+3) Godot'u aç → "İçe Aktar" (Import) → bu klasördeki project.godot dosyasını seç.
+4) Proje açılınca F5'e (ya da sağ üstteki ▶ düğmesine) bas.
+   İlk açılışta dünya 3-6 saniyede üretilir (yükleme ekranı görünür).
+
+DOSYALAR
+- ejderha.gd   → Oyunun tamamı (arazi, nehirler, göl, orman, köyler, inekler,
+                 ejderha modeli, uçuş fiziği, sesler, müzik, arayüz) bu tek dosyada.
+- main.tscn    → Script'i çalıştıran tek düğümlük sahne.
+- project.godot → 1920x1080, tam ekran, Forward+ ayarları.
+
+KONTROLLER (oyunda F1 ile de görülür)
+Fare ............ bak / ejderhayı yönlendir (nereye bakarsan oraya uçar)
+W ............... kanat çırp, hızlan
+Shift ........... güçlü kanat (daha hızlı, GÜÇ harcar)
+S ............... fren; yavaşken havada asılı kal → yere yaklaşınca iner
+A / D ........... yana yatış
+Boşluk .......... güçlü kanat vuruşu / yerden kalkış
+Ctrl ............ kanatları kapat, dalış
+Sol tık ......... ateş püskürt (ağaçlar tutuşur)
+Sağ tık / R ..... kükre (kuşlar ve inekler kaçar)
+E ............... ejderhadan in / bin
+F ............... yayayken ejderhayı çağır (uçarak yanına gelir)
+1 / 2 / 3 / 4 .... ejderha türü seç (G: sıradaki tür, menüden de seçilir)
+Tekerlek ........ kamera mesafesi      Alt ... serbest bakış
+Tab ............. büyük harita          T ..... zamanı hızlandır (gün/gece)
+M ............... müzik aç/kapa         F2 .... grafik kalitesi
+F11 ............. tam ekran / pencere   Esc ... menü
+Oyun kolu (Xbox/PlayStation) da desteklenir.
+
+GÖREV
+Vadiye saçılmış 25 altın halkanın içinden geç. Her halka GÜÇ ve ATEŞ'i doldurur.
+
+GRAFİK KALİTESİ
+Varsayılan "Ultra" (SDFGI global aydınlatma, hacimsel sis, 4x MSAA, uzun gölge mesafesi).
+FPS düşerse F2 ile Yüksek / Orta / Düşük'e geç; ayar kaydedilir.
+
+YENİ — SÜRÜM 1.1
+- 4 ejderha türü (hepsi öncekinden büyük):
+    1  Kızıl Alev   — dengeli, turuncu ateş
+    2  Buz Rüzgârı  — en hızlı ve çevik, buz nefesi ağaçları dondurur
+    3  Zümrüt Dev   — dev, güçlü ve dayanıklı ama ağır; yeşil alev
+    4  Gölge Gece   — çok çevik, mor alev
+  Her türün boyu, kanat açıklığı, rengi, uçuş hissi, ateşi ve kükremesi farklı.
+- Gökyüzünde farklı türlerden yabani ejderhalar uçuyor.
+- Ortaçağ müzikleri (kodla sentezlenir): kaval, lavta, gayda, bendir, def, el çırpma.
+    Uçarken neşeli bir jig, köylerin yakınında gaydalı şenlik havası,
+    gece ve akşam köylerde taverna valsi. Parçalar arasında yumuşak geçiş var.
+- Köylerde şenlik: kurdeleli şenlik direği, bayrak süsleri, gece yanan fenerler,
+  pazar tezgâhları ve direğin etrafında dans eden köylüler.
