@@ -62,9 +62,9 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" DEVELOPMENT_TEAM="" \
             build > xb.log 2>&1 || rc=$?
           rc=${rc:-0}
-          grep -nE "Undefined symbols|ld: |_OBJC|symbol\(s\)|referenced from|library not found|framework not found|error:" xb.log | head -9 | cut -c1-280 | sed 's/^/::warning::/'
-          grep -nE "Undefined symbols|ld: |_OBJC|referenced from|library not found|framework not found" xb.log | sed -n '10,18p' | cut -c1-280 | sed 's/^/::notice::/'
-          grep -n "Ld " xb.log | head -2 | cut -c1-280 | sed 's/^/::notice::/'
+          grep -nE "Undefined symbols|ld: |_OBJC|symbol\(s\)|referenced from|library not found|framework not found|error:" xb.log | head -9 | cut -c1-280 | sed 's/^/::warning::/' || true
+          grep -nE "Undefined symbols|ld: |_OBJC|referenced from|library not found|framework not found" xb.log | sed -n '10,18p' | cut -c1-280 | sed 's/^/::notice::/' || true
+          grep -n "Ld " xb.log | head -2 | cut -c1-280 | sed 's/^/::notice::/' || true
           tail -n 60 xb.log
           [ $rc -eq 0 ] || { echo "::error::xcodebuild başarısız (kod $rc)"; exit 1; }
           APP=dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app
