@@ -21,6 +21,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: En yeni Xcode'u seç (Godot 4.7 iOS 26 SDK ister)
+        run: |
+          ls -d /Applications/Xcode*.app
+          X=$(ls -d /Applications/Xcode_*.app | grep -E 'Xcode_[0-9.]+\.app$' | sort -V | tail -n 1)
+          sudo xcode-select -s "$X/Contents/Developer"
+          xcodebuild -version
+          echo "::notice title=Xcode::$X"
+
       - name: Godot ve iOS şablonunu indir
         run: |
           set -e
