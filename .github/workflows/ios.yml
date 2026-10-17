@@ -54,8 +54,9 @@ jobs:
             CODE_SIGN_ENTITLEMENTS="" DEVELOPMENT_TEAM="" \
             build > xb.log 2>&1 || rc=$?
           rc=${rc:-0}
-          ERR=$( (grep -E "error:|BUILD (SUCCEEDED|FAILED)|\*\* " xb.log | head -30; echo "--- son satirlar ---"; tail -n 25 xb.log) | cut -c1-300 | sed ':a;N;$!ba;s/%/%25/g;s/\r//g;s/\n/%0A/g')
-          echo "::notice title=xcodebuild ozeti::$ERR"
+          grep -nE "Undefined symbols|ld: |_OBJC|symbol\(s\)|referenced from|library not found|framework not found|error:" xb.log | head -9 | cut -c1-280 | sed 's/^/::warning::/'
+          grep -nE "Undefined symbols|ld: |_OBJC|referenced from|library not found|framework not found" xb.log | sed -n '10,18p' | cut -c1-280 | sed 's/^/::notice::/'
+          grep -n "Ld " xb.log | head -2 | cut -c1-280 | sed 's/^/::notice::/'
           tail -n 60 xb.log
           [ $rc -eq 0 ] || { echo "::error::xcodebuild başarısız (kod $rc)"; exit 1; }
           APP=dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app
