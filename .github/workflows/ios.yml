@@ -39,25 +39,34 @@ jobs:
           cd game
           mkdir -p build
           "$GODOT" --headless --import || true
-          "$GODOT" --headless --export-release "iOS" build/EjderhaSuvarisi.ipa
+          "$GODOT" --headless --export-release "iOS" build/EjderhaSuvarisi.ipa 2>&1 | grep -vE "^(READ|ADDING|Creating) " | tail -n 40
           ls build
+          test -d build/EjderhaSuvarisi.xcodeproj || { echo "::error::Xcode projesi oluşmadı"; exit 1; }
 
       - name: İmzasız derle (.app)
         run: |
-          set -e
+          set -o pipefail
           cd game/build
           xcodebuild -project EjderhaSuvarisi.xcodeproj -scheme EjderhaSuvarisi \
             -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
             -derivedDataPath dd \
             CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" \
             CODE_SIGN_ENTITLEMENTS="" DEVELOPMENT_TEAM="" \
-            build | tail -n 40
-          ls dd/Build/Products/Release-iphoneos
+            build > xb.log 2>&1
+          rc=$?
+          grep -E "error:|BUILD (SUCCEEDED|FAILED)|warning: .*(sign|entitle)" xb.log | head -25 | sed 's/^/::warning::/'
+          tail -n 60 xb.log
+          [ $rc -eq 0 ] || { echo "::error::xcodebuild başarısız (kod $rc)"; exit 1; }
+          APP=dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app
+          ls -la "$APP"
+          test -f "$APP/EjderhaSuvarisi" || { echo "::error::.app içinde çalıştırılabilir dosya yok"; exit 1; }
+          test -f "$APP/Info.plist" || { echo "::error::.app içinde Info.plist yok"; exit 1; }
 
       - name: .ipa paketle
         run: |
           set -e
           cd game/build
+          du -sh dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app
           rm -rf Payload && mkdir Payload
           cp -R dd/Build/Products/Release-iphoneos/EjderhaSuvarisi.app Payload/
           zip -qry ../../EjderhaSuvarisi.ipa Payload
